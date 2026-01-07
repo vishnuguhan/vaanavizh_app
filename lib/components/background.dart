@@ -24,6 +24,7 @@ class GameBackground extends Component with HasGameRef<VaanavizhGame> {
 
     starPaint = Paint()..color = Colors.white.withOpacity(0.6);
   }
+
   @override
   void render(Canvas canvas) {
     super.render(canvas);

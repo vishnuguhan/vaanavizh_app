@@ -10,7 +10,6 @@ class PoemCollectible extends PositionComponent
   static const double size = 60.0;
   final String poemText;
   bool collected = false;
-  late Paint starPaint;
   late Path starPath;
 
   PoemCollectible({
