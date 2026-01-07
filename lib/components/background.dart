@@ -3,6 +3,27 @@ import 'package:flutter/material.dart';
 import 'package:vaanavizh_app/game/vaanavizh_game.dart';
 
 class GameBackground extends Component with HasGameRef<VaanavizhGame> {
+  late List<Offset> starPositions;
+  late List<double> starRadii;
+  late Paint starPaint;
+
+  @override
+  Future<void> onLoad() async {
+    await super.onLoad();
+
+    // Pre-calculate star positions
+    starPositions = [];
+    starRadii = [];
+    for (int i = 0; i < 50; i++) {
+      final x = (i * 137.5) % gameRef.size.x;
+      final y = (i * 97.3) % gameRef.size.y;
+      final radius = (i % 3) + 1.0;
+      starPositions.add(Offset(x, y));
+      starRadii.add(radius);
+    }
+
+    starPaint = Paint()..color = Colors.white.withOpacity(0.6);
+  }
   @override
   void render(Canvas canvas) {
     super.render(canvas);
@@ -24,14 +45,9 @@ class GameBackground extends Component with HasGameRef<VaanavizhGame> {
       paint,
     );
 
-    // Draw stars in the background
-    final starPaint = Paint()..color = Colors.white.withOpacity(0.6);
-
-    for (int i = 0; i < 50; i++) {
-      final x = (i * 137.5) % gameRef.size.x;
-      final y = (i * 97.3) % gameRef.size.y;
-      final radius = (i % 3) + 1.0;
-      canvas.drawCircle(Offset(x, y), radius, starPaint);
+    // Draw stars in the background using pre-calculated positions
+    for (int i = 0; i < starPositions.length; i++) {
+      canvas.drawCircle(starPositions[i], starRadii[i], starPaint);
     }
 
     // Draw title

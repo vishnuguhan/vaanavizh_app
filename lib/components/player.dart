@@ -6,6 +6,10 @@ class Player extends PositionComponent {
   static const double size = 40.0;
 
   Vector2? targetPosition;
+  late Paint gradientPaint;
+  late Paint eyePaint;
+  late Paint pupilPaint;
+  late Paint smilePaint;
 
   Player({required Vector2 position})
       : super(
@@ -13,6 +17,19 @@ class Player extends PositionComponent {
           size: Vector2.all(size),
           anchor: Anchor.center,
         );
+
+  @override
+  Future<void> onLoad() async {
+    await super.onLoad();
+
+    // Pre-create paint objects
+    eyePaint = Paint()..color = Colors.white;
+    pupilPaint = Paint()..color = Colors.black;
+    smilePaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+  }
 
   @override
   void render(Canvas canvas) {
@@ -37,7 +54,6 @@ class Player extends PositionComponent {
     );
 
     // Draw eyes
-    final eyePaint = Paint()..color = Colors.white;
     canvas.drawCircle(
       Offset(size.x * 0.35, size.y * 0.35),
       4,
@@ -50,7 +66,6 @@ class Player extends PositionComponent {
     );
 
     // Draw pupils
-    final pupilPaint = Paint()..color = Colors.black;
     canvas.drawCircle(
       Offset(size.x * 0.35, size.y * 0.35),
       2,
@@ -63,10 +78,6 @@ class Player extends PositionComponent {
     );
 
     // Draw smile
-    final smilePaint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
     canvas.drawArc(
       Rect.fromLTWH(
         size.x * 0.25,

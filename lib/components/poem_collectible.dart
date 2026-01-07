@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,8 @@ class PoemCollectible extends PositionComponent
   static const double size = 60.0;
   final String poemText;
   bool collected = false;
+  late Paint starPaint;
+  late Path starPath;
 
   PoemCollectible({
     required Vector2 position,
@@ -23,6 +26,26 @@ class PoemCollectible extends PositionComponent
   Future<void> onLoad() async {
     await super.onLoad();
     add(CircleHitbox(radius: size / 2));
+
+    // Pre-create star path
+    starPath = Path();
+    for (int i = 0; i < 5; i++) {
+      final angle = (i * 4 * pi / 5) - pi / 2;
+      final outerX = size / 2 + size / 2 * 0.8 * cos(angle);
+      final outerY = size / 2 + size / 2 * 0.8 * sin(angle);
+
+      if (i == 0) {
+        starPath.moveTo(outerX, outerY);
+      } else {
+        starPath.lineTo(outerX, outerY);
+      }
+
+      final innerAngle = angle + 2 * pi / 10;
+      final innerX = size / 2 + size / 2 * 0.3 * cos(innerAngle);
+      final innerY = size / 2 + size / 2 * 0.3 * sin(innerAngle);
+      starPath.lineTo(innerX, innerY);
+    }
+    starPath.close();
   }
 
   @override
@@ -43,27 +66,8 @@ class PoemCollectible extends PositionComponent
         radius: size.x / 2,
       ));
 
-    // Draw star shape
-    final path = Path();
-    for (int i = 0; i < 5; i++) {
-      final angle = (i * 4 * 3.14159 / 5) - 3.14159 / 2;
-      final outerX = size.x / 2 + size.x / 2 * 0.8 * cos(angle);
-      final outerY = size.y / 2 + size.y / 2 * 0.8 * sin(angle);
-
-      if (i == 0) {
-        path.moveTo(outerX, outerY);
-      } else {
-        path.lineTo(outerX, outerY);
-      }
-
-      final innerAngle = angle + 2 * 3.14159 / 10;
-      final innerX = size.x / 2 + size.x / 2 * 0.3 * cos(innerAngle);
-      final innerY = size.y / 2 + size.y / 2 * 0.3 * sin(innerAngle);
-      path.lineTo(innerX, innerY);
-    }
-    path.close();
-
-    canvas.drawPath(path, paint);
+    // Draw star shape using pre-created path
+    canvas.drawPath(starPath, paint);
 
     // Draw text
     final textPainter = TextPainter(
@@ -85,29 +89,6 @@ class PoemCollectible extends PositionComponent
         (size.y - textPainter.height) / 2,
       ),
     );
-  }
-
-  double cos(double angle) => angle.abs() < 0.0001
-      ? 1.0
-      : angle.abs() - 3.14159 / 2 < 0.0001
-          ? 0.0
-          : _cosTaylor(angle);
-
-  double sin(double angle) => cos(angle - 3.14159 / 2);
-
-  double _cosTaylor(double x) {
-    // Taylor series approximation for cos
-    x = x % (2 * 3.14159);
-    if (x > 3.14159) x -= 2 * 3.14159;
-    if (x < -3.14159) x += 2 * 3.14159;
-
-    double result = 1.0;
-    double term = 1.0;
-    for (int i = 1; i <= 10; i++) {
-      term *= -x * x / ((2 * i - 1) * (2 * i));
-      result += term;
-    }
-    return result;
   }
 
   @override
